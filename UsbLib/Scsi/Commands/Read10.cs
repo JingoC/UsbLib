@@ -14,7 +14,7 @@ namespace UsbLib.Scsi.Commands
             var sectorsBytes = BitConverter.GetBytes(sectors).Reverse<byte>().ToArray();
 
             this.Sptw.SetCdb(lbaBytes, 0, 2, 4);
-            this.Sptw.SetCdb(sectorsBytes, 0, 6, 2);
+            this.Sptw.SetCdb(sectorsBytes, 2, 7, 2);
             
             this.Sptw.SetDataLength((uint)(sectors * 512));
         }

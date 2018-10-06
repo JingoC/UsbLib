@@ -26,26 +26,20 @@ namespace UsbLib
             byte[] data = new byte[sectors * 512];
             
             UInt32 offset = 0;
-            while(sectors > 0)
-            {
-                UInt32 transferSectorLength = 0;
+            var buf = this.Read10.Sptw.GetDataBuffer();
 
-                if (sectors >= 64)
-                {
-                    transferSectorLength = 64;
-                }
-                else
-                {
-                    transferSectorLength = sectors;
-                }
+            while (sectors > 0)
+            {
+                UInt32 transferSectorLength = (sectors >= 64) ? 64 : sectors;
+                UInt32 transferBytes = transferSectorLength * 512;
 
                 this.Read10.SetBounds(lba, transferSectorLength);
                 this.Execute(ScsiCommandCode.Read10);
-                this.Read10.Sptw.GetDataBuffer().CopyTo(data, transferSectorLength * 512);
+                Array.Copy(buf, 0, data, offset, transferBytes);
 
                 lba += transferSectorLength;
                 sectors -= transferSectorLength;
-                offset += transferSectorLength * 512;
+                offset += transferBytes;
             }
 
             return data;

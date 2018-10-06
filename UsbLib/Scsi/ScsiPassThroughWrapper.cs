@@ -66,17 +66,22 @@ namespace UsbLib.Scsi
 
         public byte[] GetCdb() => this.sptBuffered.Spt.Cdb;
         public byte[] GetCdb(int start, int count) => this.sptBuffered.Spt.Cdb.ToList().GetRange(start, count).ToArray();
-        public void SetCdb(byte[] data, int startSrc, int startDst, int count)
+        public void SetCdb(byte[] cdb) => this.SetCdb(cdb, 0, 0, cdb.Length);
+        public void SetCdb(byte[] cdb, int startSrc, int startDst, int count)
         {
-            for (int i = 0; i < count; i++)
-                this.sptBuffered.Spt.Cdb[i + startDst] = data[i + startSrc];
+            Array.Copy(cdb, startSrc, this.sptBuffered.Spt.Cdb, startDst, count);
+            
+#if true
+            Console.WriteLine("");
+            Console.Write("CDB: ");
+            for (int i = 0; i < 16; i++)
+                Console.Write(string.Format("{0:X} ", this.sptBuffered.Spt.Cdb[i]));
+#endif
         }
 
         public byte[] GetDataBuffer() => this.sptBuffered.Buffer;
         public byte[] GetDataBuffer(int start, int count) => this.sptBuffered.Buffer.ToList().GetRange(start, count).ToArray();
 
         public void SetDataLength(UInt32 dataLength) => this.sptBuffered.Spt.DataTransferLength = dataLength;
-
-        public void SetCdb(byte[] cdb) => cdb?.CopyTo(this.sptBuffered.Spt.Cdb, 0);
     }
 }

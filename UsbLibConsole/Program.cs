@@ -16,7 +16,14 @@ namespace UsbLibConsole
         static void PrintBuffer(byte[] buf, int start, int count)
         {
             for (int i = start; i < count; i++)
-                Console.Write(string.Format("0x{0:X} ", buf[i]));
+            {
+                if ((i % 16) == 0)
+                    Console.WriteLine("");
+
+                Console.Write(string.Format("{0:X2} ", buf[i]));
+            }
+                
+                    
         }
 
         static void UsbDriverTest()
@@ -26,7 +33,7 @@ namespace UsbLibConsole
             //try
             {
                 Console.WriteLine($"Connect device: {usb.Connect("E")}");
-                
+
                 if (usb.Execute(ScsiCommandCode.ReadCapacity))
                 {
                     ReadCapacity rc10 = usb.ReadCapacity;
@@ -48,19 +55,29 @@ namespace UsbLibConsole
 
                     Console.WriteLine("");
                     Console.Write("Inquiry: ");
-                    for(int i = 0; i < 32; i++)
+                    for (int i = 0; i < 32; i++)
                         Console.Write(string.Format("{0:X} ", po[i]));
                 }
 
-                usb.Read10.SetBounds(0, 1);
+#if false
+                usb.Read10.SetBounds(0, 64);
+                usb.Read10.Sptw.SetCdb(new byte[]
+                {
+                    (byte) ScsiCommandCode.Read10, 0,
+                    0, 0, 0, 64,
+                    0,
+                    0, 64,
+                    0
+                });
                 usb.Execute(ScsiCommandCode.Read10);
-                var data = usb.Read10.Sptw.GetDataBuffer(0, 512);
+                var data = usb.Read10.Sptw.GetDataBuffer();
                 Console.WriteLine("");
                 Console.WriteLine("Data: ");
-                PrintBuffer(data, 0, 512);
-
-                //byte[] readData = usb.Read(0, 64 * 1024);
-                //System.IO.File.WriteAllBytes("test.bin", readData);
+                PrintBuffer(data, 0, 128);
+#else
+                byte[] readData = usb.Read(1, 1);
+                System.IO.File.WriteAllBytes("test.bin", readData);
+#endif
 
             }
             /*
