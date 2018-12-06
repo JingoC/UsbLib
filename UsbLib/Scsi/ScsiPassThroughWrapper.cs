@@ -42,6 +42,9 @@ namespace UsbLib.Scsi
         public Byte[] Buffer;
     }
 
+    /// <summary>
+    /// Wrapping standart format scsi protocol data
+    /// </summary>
     public class ScsiPassThroughWrapper
     {
         public ScsiPassThroughBuffered sptBuffered;

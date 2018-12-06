@@ -47,6 +47,7 @@
     <Compile Include="Scsi\Commands\Read10.cs" />
     <Compile Include="Scsi\Commands\ReadCapacity.cs" />
     <Compile Include="Scsi\Commands\ScsiCommand.cs" />
+    <Compile Include="Scsi\Commands\Write10.cs" />
     <Compile Include="Scsi\ScsiDevice.cs" />
     <Compile Include="Scsi\ScsiPassThroughWrapper.cs" />
     <Compile Include="UsbScsiDevice.cs" />

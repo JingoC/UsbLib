@@ -11,6 +11,7 @@ namespace UsbLib.Scsi.Commands
         Inquiry = 0x12,
         ReadCapacity = 0x25,
         Read10 = 0x28,
+        Write10 = 0x2A
     }
 
     public class ScsiCommand

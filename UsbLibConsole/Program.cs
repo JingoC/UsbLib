@@ -30,7 +30,7 @@ namespace UsbLibConsole
         {
             UsbScsiDevice usb = new UsbScsiDevice();
 
-            //try
+            try
             {
                 Console.WriteLine($"Connect device: {usb.Connect("E")}");
 
@@ -80,13 +80,11 @@ namespace UsbLibConsole
 #endif
 
             }
-            /*
             catch(Exception e)
             {
                 Console.WriteLine($"Exception: {e.Message}");
                 usb.Disconnect();
             }
-            */
         }
 
         static void Main(string[] args)

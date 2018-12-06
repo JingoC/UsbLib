@@ -10,6 +10,9 @@ namespace UsbLib
     using UsbLib.Scsi;
     using UsbLib.Scsi.Commands;
 
+    /// <summary>
+    /// Scsi device class on base Usb Bulk protocol
+    /// </summary>
     public class UsbScsiDevice : ScsiDevice
     {
         UsbDriver usb = new UsbDriver();
@@ -18,9 +21,19 @@ namespace UsbLib
 
         public void Disconnect() => this.usb.Disconnect();
 
-
+        /// <summary>
+        /// Execute scsi command by scsi code
+        /// </summary>
+        /// <param name="code">scsi command code</param>
+        /// <returns>result operation</returns>
         public bool Execute(ScsiCommandCode code) => this.usb.Ioctl(this.Commands[code].Sptw);
 
+        /// <summary>
+        /// Read data from device
+        /// </summary>
+        /// <param name="lba">logical block address</param>
+        /// <param name="sectors">count read sectors</param>
+        /// <returns>read data</returns>
         public byte[] Read(UInt32 lba, UInt32 sectors)
         {
             byte[] data = new byte[sectors * 512];
@@ -43,6 +56,32 @@ namespace UsbLib
             }
 
             return data;
+        }
+
+        /// <summary>
+        /// Write data in device
+        /// </summary>
+        /// <param name="lba">logical block address</param>
+        /// <param name="sectors">count read sectors</param>
+        /// <param name="data">writing data (alignment by 512 bytes)</param>
+        public void Write(UInt32 lba, UInt32 sectors, byte[] data)
+        {
+            UInt32 offset = 0;
+            var buf = this.Write10.Sptw.GetDataBuffer();
+
+            while(sectors > 0)
+            {
+                UInt32 transferSectorLength = (sectors >= 64) ? 64 : sectors;
+                UInt32 transferBytes = transferSectorLength * 512;
+
+                Array.Copy(data, offset, buf, 0, transferBytes);
+                this.Write10.SetBounds(lba, transferSectorLength);
+                this.Execute(ScsiCommandCode.Write10);
+
+                lba += transferSectorLength;
+                sectors -= transferSectorLength;
+                offset += transferBytes;
+            }
         }
     }
 }

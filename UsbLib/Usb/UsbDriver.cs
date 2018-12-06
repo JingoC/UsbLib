@@ -16,6 +16,9 @@ namespace UsbLib.Usb
         IOCTL_STORAGE_EJECT_MEDIA = 0x2D4808
     }
 
+    /// <summary>
+    /// Usb driver class on base DeviceIoControl mechanism
+    /// </summary>
     public class UsbDriver
     {
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
@@ -39,6 +42,11 @@ namespace UsbLib.Usb
 
         private IntPtr handle = IntPtr.Zero;
 
+        /// <summary>
+        /// Open device by drive name
+        /// </summary>
+        /// <param name="usb">drive name</param>
+        /// <returns></returns>
         public bool Connect(string usb)
         {
             uint shareMode = (uint)(DataDirection.FILE_SHARE_READ | DataDirection.FILE_SHARE_WRITE);
@@ -50,8 +58,16 @@ namespace UsbLib.Usb
             return ((long)this.handle != -1);
         }
 
+        /// <summary>
+        /// Close device
+        /// </summary>
         public void Disconnect() => CloseHandle(this.handle);
         
+        /// <summary>
+        /// Wrapper calling low level function DeviceIoControl
+        /// </summary>
+        /// <param name="sptw">scsi params</param>
+        /// <returns></returns>
         public bool Ioctl(ScsiPassThroughWrapper sptw)
         {
             IntPtr bufferPointer = IntPtr.Zero;
