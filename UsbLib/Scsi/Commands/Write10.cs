@@ -21,7 +21,7 @@ namespace UsbLib.Scsi.Commands
 
         public Write10() :
             base(new ScsiPassThroughWrapper(new byte[] { (byte)ScsiCommandCode.Write10, 0, 0, 0, 0, 0, 0, 0 },
-                DataDirection.FILE_SHARE_READ, 8))
+                DataDirection.SCSI_IOCTL_OUT, 8))
         {
 
         }

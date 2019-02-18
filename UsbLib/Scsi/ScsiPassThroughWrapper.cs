@@ -9,8 +9,8 @@ namespace UsbLib.Scsi
 {
     public enum DataDirection
     {
-        FILE_SHARE_READ = 1,
-        FILE_SHARE_WRITE = 2,
+        SCSI_IOCTL_OUT = 0,
+        SCSI_IOCTL_IN = 1,
         SCSI_IOCTL_DATA_UNSPECIFIED = 3
     }
 
@@ -65,6 +65,8 @@ namespace UsbLib.Scsi
             this.sptBuffered.Spt.DataIn = (byte) direction;
             this.SetDataLength(dataTransferLength);
             this.sptBuffered.Spt.DataBufferOffset = new IntPtr(Marshal.SizeOf(this.sptBuffered) - 65536);
+
+            this.sptBuffered.Buffer = new byte[65536];
         }
 
         public byte[] GetCdb() => this.sptBuffered.Spt.Cdb;
@@ -74,7 +76,7 @@ namespace UsbLib.Scsi
         {
             Array.Copy(cdb, startSrc, this.sptBuffered.Spt.Cdb, startDst, count);
             
-#if true
+#if false
             Console.WriteLine("");
             Console.Write("CDB: ");
             for (int i = 0; i < 16; i++)

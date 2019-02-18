@@ -17,7 +17,8 @@ namespace UsbLib.Scsi.Commands
         public float Capacity() => (float)this.CountSectors() * this.SizeSector();
 
         public ReadCapacity() : 
-            base(new ScsiPassThroughWrapper(new byte[] { (byte) ScsiCommandCode.ReadCapacity, 0, 0, 0, 0, 0, 0, 0 }, DataDirection.FILE_SHARE_READ, 8))
+            base(new ScsiPassThroughWrapper(new byte[] { (byte) ScsiCommandCode.ReadCapacity, 0, 0, 0, 0, 0, 0, 0 },
+                DataDirection.SCSI_IOCTL_IN, 8))
         {
 
         }

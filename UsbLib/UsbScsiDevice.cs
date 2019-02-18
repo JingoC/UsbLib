@@ -39,8 +39,7 @@ namespace UsbLib
             byte[] data = new byte[sectors * 512];
             
             UInt32 offset = 0;
-            var buf = this.Read10.Sptw.GetDataBuffer();
-
+            
             while (sectors > 0)
             {
                 UInt32 transferSectorLength = (sectors >= 64) ? 64 : sectors;
@@ -48,7 +47,13 @@ namespace UsbLib
 
                 this.Read10.SetBounds(lba, transferSectorLength);
                 this.Execute(ScsiCommandCode.Read10);
+
+                var buf = this.Read10.Sptw.GetDataBuffer();
                 Array.Copy(buf, 0, data, offset, transferBytes);
+
+#if false
+                this.PrintData(lba, transferSectorLength, buf);
+#endif
 
                 lba += transferSectorLength;
                 sectors -= transferSectorLength;
@@ -76,11 +81,35 @@ namespace UsbLib
 
                 Array.Copy(data, offset, buf, 0, transferBytes);
                 this.Write10.SetBounds(lba, transferSectorLength);
-                this.Execute(ScsiCommandCode.Write10);
+                if (!this.Execute(ScsiCommandCode.Write10))
+                    Console.WriteLine("Error Ioctl: 0x{0:X8}", this.usb.GetError());
 
                 lba += transferSectorLength;
                 sectors -= transferSectorLength;
                 offset += transferBytes;
+            }
+        }
+
+        private void PrintData(UInt32 lba, UInt32 sectors, byte[] data)
+        {
+            int columns = 16;
+            int rows = (int)sectors * 512 / columns;
+            for (int row = 0; row < rows; row++)
+            {
+                Console.Write(string.Format("{0}{1:X8} | ", Environment.NewLine, lba * 512 + row * columns));
+                for (int col = 0; col < columns; col++)
+                {
+                    Console.Write(string.Format("{0:X2} ", data[row * columns + col]));
+                }
+
+                Console.Write("| ");
+
+                for (int ch = 0; ch < columns; ch++)
+                {
+                    char code = (char)data[row * columns + ch];
+                    bool isTextNumber = (code > 0x20) && (code < 0x80);
+                    Console.Write(isTextNumber ? code : '.');
+                }
             }
         }
     }

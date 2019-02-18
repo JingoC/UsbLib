@@ -75,8 +75,37 @@ namespace UsbLibConsole
                 Console.WriteLine("Data: ");
                 PrintBuffer(data, 0, 128);
 #else
-                byte[] readData = usb.Read(1, 1);
-                System.IO.File.WriteAllBytes("test.bin", readData);
+                // offset in flash (use for GRUB)
+                UInt32 startByteAddress = 0x7E00;
+                UInt32 readLba = startByteAddress / 512;
+
+                void UsbToFile(string file, UInt32 lba, UInt32 sectors)
+                {
+                    byte[] readData = usb.Read(lba, sectors);
+                    System.IO.File.WriteAllBytes(file, readData);
+                }
+
+                UsbToFile("test.bin", readLba, 256);
+
+                Console.WriteLine("press any key to continue...");
+                Console.ReadKey();
+
+                // Write 0x1A00
+                UInt32 writeBytesAddress = startByteAddress + 0x1A00;
+                UInt32 writeLba = writeBytesAddress / 512;
+
+                byte[] writeData = new byte[512];
+                for(int i = 0; i < 512; i++)
+                {
+                    writeData[i] = (byte)(i + 16);
+                }
+
+                Console.WriteLine("press any key to continue...");
+                Console.ReadKey();
+                usb.Write(writeLba, 1, writeData);
+
+                // Read reply
+                UsbToFile("test1.bin", readLba, 256);
 #endif
 
             }

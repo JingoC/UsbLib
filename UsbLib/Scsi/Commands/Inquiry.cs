@@ -10,7 +10,7 @@ namespace UsbLib.Scsi.Commands
     {
         public Inquiry() :
             base(new ScsiPassThroughWrapper(new byte[] { (byte)ScsiCommandCode.Inquiry, 0, 0, 0, 0, 0 },
-                DataDirection.FILE_SHARE_READ, 58))
+                DataDirection.SCSI_IOCTL_IN, 58))
         {
 
         }
